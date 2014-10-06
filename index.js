@@ -2,6 +2,7 @@ var ForkDB = require('forkdb');
 var inherits = require('inherits');
 var through = require('through2');
 var inherits = require('inherits');
+var defined = require('defined');
 
 module.exports = WikiDB;
 inherits(WikiDB, ForkDB);
@@ -20,6 +21,11 @@ WikiDB.prototype.createWriteStream = function (key, cb) {
                 key: [ 'wiki', Date.now(), key ],
                 value: wkey
             });
+            rows.push({
+                type: 'put',
+                key: [ 'wiki-key', key, Date.now() ],
+                value: wkey
+            });
             return rows;
         }
     };
@@ -35,13 +41,23 @@ WikiDB.prototype.createWriteStream = function (key, cb) {
     }
 };
 
-WikiDB.prototype.recent = function (key, cb) {
+WikiDB.prototype.recent = function (opts) {
+    if (!opts) opts = {};
     var self = this;
-    var opts = {
-        gt: [ 'wiki', null ],
-        lt: [ 'wiki', undefined ]
-    };
-    var s = self.db.createReadStream(opts);
+    var sopts;
+    if (opts.key) {
+        sopts = {
+            gt: [ 'wiki-key', opts.key, defined(opts.gt, null) ],
+            lt: [ 'wiki-key', opts.key, opts.lt ]
+        };
+    }
+    else {
+        sopts = {
+            gt: [ 'wiki', defined(opts.gt, null) ],
+            lt: [ 'wiki', opts.lt ]
+        };
+    }
+    var s = self.db.createReadStream(sopts);
     var tr = through.obj(function (row, enc, next) {
         self.getMeta(row.value, function (err, meta) {
             tr.push({ hash: row.value, meta: meta });
@@ -49,6 +65,5 @@ WikiDB.prototype.recent = function (key, cb) {
         });
     });
     s.on('error', function (err) { tr.emit('error', err) });
-    if (cb) tr.on('error', cb);
     return s.pipe(tr);
 };
