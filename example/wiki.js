@@ -1,5 +1,6 @@
 var level = require('level');
 var minimist = require('minimist');
+var isarray = require('isarray');
 var wikidb = require('../');
 
 var db = level('/tmp/wiki.db');
@@ -13,7 +14,14 @@ else if (argv._[0] === 'recent') {
     wdb.recent().on('data', console.log);
 }
 else if (argv._[0] === 'create') {
-    var w = wdb.createWriteStream(argv._[1], function (err, key) {
+    var meta = { key: argv._[1] };
+    if (isarray(argv.prev)) {
+        meta.prev = argv.prev;
+    }
+    else if (argv.prev) {
+        meta.prev = [ argv.prev ];
+    }
+    var w = wdb.createWriteStream(meta, function (err, key) {
         if (err) error(err)
         else console.log(key)
     });

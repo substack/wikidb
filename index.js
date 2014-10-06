@@ -13,32 +13,25 @@ function WikiDB (db, opts) {
     ForkDB.call(this, db, opts);
 }
 
-WikiDB.prototype.createWriteStream = function (key, cb) {
+WikiDB.prototype.createWriteStream = function (meta, cb) {
+    if (!meta) meta = {};
+    if (!meta.time) meta.time = Date.now();
     var opts = {
         prebatch: function (rows, wkey) {
             rows.push({
                 type: 'put',
-                key: [ 'wiki', Date.now(), key ],
+                key: [ 'wiki', Date.now(), meta.key ],
                 value: wkey
             });
             rows.push({
                 type: 'put',
-                key: [ 'wiki-key', key, Date.now() ],
+                key: [ 'wiki-key', meta.key, Date.now() ],
                 value: wkey
             });
             return rows;
         }
     };
-    var meta = {
-        key: key,
-        time: Date.now()
-    };
-    return ForkDB.prototype.createWriteStream.call(this, meta, opts, fn);
-    
-    function fn (err, key) {
-        if (err && cb) cb(err)
-        else if (cb) cb(key)
-    }
+    return ForkDB.prototype.createWriteStream.call(this, meta, opts, cb);
 };
 
 WikiDB.prototype.recent = function (opts) {
