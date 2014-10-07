@@ -4,6 +4,7 @@ var through = require('through2');
 var inherits = require('inherits');
 var defined = require('defined');
 var combine = require('stream-combiner2');
+var split = require('split');
 
 module.exports = WikiDB;
 inherits(WikiDB, ForkDB);
@@ -85,7 +86,8 @@ WikiDB.prototype.byTag = function (opts) {
     if (typeof opts === 'string') opts = { tag: opts };
     var r = this.db.createReadStream({
         gt: [ 'wiki-tag', opts.tag, defined(opts.gt, null) ],
-        lt: [ 'wiki-tag', opts.tag, defined(opts.lt, undefined) ]
+        lt: [ 'wiki-tag', opts.tag, defined(opts.lt, undefined) ],
+        limit: opts.limit
     });
     return combine([ r, through.obj(write) ]);
     
@@ -98,7 +100,40 @@ WikiDB.prototype.byTag = function (opts) {
     }
 };
 
-WikiDB.prototype.search = function (terms) {
+WikiDB.prototype.search = function (terms, opts) {
+    var self = this;
+    if (!opts) opts = {};
+    if (typeof terms === 'string') terms = terms.split(/\s+/);
+    
+    return this.heads().pipe(through.obj(function (row, enc, next) {
+        var output = this;
+        var matches = terms.slice();
+        var pending = 2;
+        self.getMeta(row.hash, function (err, meta) {
+            if (meta && meta.tags) {
+                meta.tags.forEach(ifmatch);
+            }
+            end();
+        });
+        var words = through(function (buf, enc, next) {
+            ifmatch(buf.toString('utf8'));
+            if (matches.length) next();
+        }, end);
+        self.get(row.hash).pipe(split(/[^\w~-]/)).pipe(words);
+        
+        function ifmatch (word) {
+            var ix = matches.indexOf(word);
+            if (ix < 0) return;
+            matches.splice(ix, 1);
+            if (matches.length === 0) {
+                output.push(row);
+                next();
+            }
+        }
+        function end () {
+            if (matches.length !== 0 && -- pending === 0) next();
+        }
+    }));
 };
 
 WikiDB.prototype.recent = function (opts) {

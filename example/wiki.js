@@ -18,6 +18,9 @@ else if (argv._[0] === 'recent') {
 else if (argv._[0] === 'by-tag') {
     wdb.byTag(argv._[1]).on('data', console.log);
 }
+else if (argv._[0] === 'search') {
+    wdb.search(argv._.slice(1)).on('data', console.log);
+}
 else if (argv._[0] === 'create') {
     var meta = { key: argv._[1] };
     if (argv.prev) meta.prev = [].concat(argv.prev);
