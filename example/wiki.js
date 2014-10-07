@@ -7,11 +7,14 @@ var db = level('/tmp/wiki.db');
 var wdb = wikidb(db, { dir: '/tmp/wiki.blob' });
 
 var argv = minimist(process.argv.slice(2));
-if (argv._[0] === 'heads') {
-    wdb.heads().on('data', console.log);
+if (argv._[0] === 'keys') {
+    wdb.keys().on('data', console.log);
+}
+else if (argv._[0] === 'heads') {
+    wdb.heads(argv._[1]).on('data', console.log);
 }
 else if (argv._[0] === 'recent') {
-    wdb.recent().on('data', console.log);
+    wdb.recent({ key: argv._[1] }).on('data', console.log);
 }
 else if (argv._[0] === 'create') {
     var meta = { key: argv._[1] };
