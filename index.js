@@ -109,6 +109,8 @@ WikiDB.prototype.search = function (terms, opts) {
         var output = this;
         var matches = terms.slice();
         var pending = 2;
+        row.key.split(/[^\w~-]/).forEach(ifmatch);
+        
         self.getMeta(row.hash, function (err, meta) {
             if (meta && meta.tags) {
                 meta.tags.forEach(ifmatch);
