@@ -49,15 +49,17 @@ WikiDB.prototype.createWriteStream = function (meta, cb) {
             tags.forEach(function (tag) {
                 rows.push({
                     type: 'put',
-                    key: [ 'wiki-tag', tag, wkey ],
-                    value: meta.key
+                    key: [ 'wiki-tag', tag, meta.key, wkey ],
+                    value: 0
                 });
             });
         }
         if (isHead && prevHead) {
-            rows.push({
-                type: 'del',
-                key: [ 'wiki-tag', tag ].concat(prevHead)
+            tags.forEach(function (tag) {
+                rows.push({
+                    type: 'del',
+                    key: [ 'wiki-tag', tag ].concat(prevHead)
+                });
             });
         }
         return rows;
@@ -75,8 +77,8 @@ WikiDB.prototype.byTag = function (opts) {
     
     function write (row, enc, next) {
         this.push({
-            key: row.value,
-            hash: row.key[2]
+            key: row.key[2],
+            hash: row.key[3]
         });
         next();
     }
