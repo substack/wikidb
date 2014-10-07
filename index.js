@@ -27,12 +27,12 @@ WikiDB.prototype.createWriteStream = function (meta, cb) {
     function prebatch (rows, wkey, cb_) {
         rows.push({
             type: 'put',
-            key: [ 'wiki', Date.now(), meta.key ],
+            key: [ 'wiki', meta.time, meta.key ],
             value: wkey
         });
         rows.push({
             type: 'put',
-            key: [ 'wiki-key', meta.key, Date.now() ],
+            key: [ 'wiki-key', meta.key, meta.time ],
             value: wkey
         });
         
