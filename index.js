@@ -15,6 +15,7 @@ function WikiDB (db, opts) {
 }
 
 WikiDB.prototype.createWriteStream = function (meta, cb) {
+    var self = this;
     if (!meta) meta = {};
     if (!meta.time) meta.time = Date.now();
     
@@ -22,7 +23,7 @@ WikiDB.prototype.createWriteStream = function (meta, cb) {
     var opts = { prebatch: prebatch };
     return ForkDB.prototype.createWriteStream.call(this, meta, opts, cb);
     
-    function prebatch (rows, wkey) {
+    function prebatch (rows, wkey, cb_) {
         rows.push({
             type: 'put',
             key: [ 'wiki', Date.now(), meta.key ],
@@ -53,16 +54,29 @@ WikiDB.prototype.createWriteStream = function (meta, cb) {
                     value: 0
                 });
             });
+            if (tags.length) {
+                rows.push({
+                    type: 'put',
+                    key: [ 'wiki-tags', meta.key, wkey ],
+                    value: tags
+                });
+            }
         }
         if (isHead && prevHead) {
-            tags.forEach(function (tag) {
-                rows.push({
-                    type: 'del',
-                    key: [ 'wiki-tag', tag ].concat(prevHead)
+            var pkey = [ 'wiki-tags' ].concat(prevHead);
+            self.db.get(pkey, function (err, prev) {
+                if (err) return cb_(null, rows)
+                rows.push({ type: 'del', key: pkey });
+                prev.forEach(function (p) {
+                    rows.push({
+                        type: 'del',
+                        key: [ 'wiki-tag', p ].concat(prevHead)
+                    });
                 });
+                cb_(null, rows);
             });
         }
-        return rows;
+        else cb_(null, rows)
     }
 };
 
