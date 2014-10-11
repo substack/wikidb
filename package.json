@@ -1,0 +1,46 @@
+{
+  "name": "wikidb",
+  "version": "1.0.0",
+  "description": "database for offline wikis with multi-master replication",
+  "main": "index.js",
+  "bin": {
+    "wikidb": "bin/cmd.js"
+  },
+  "dependencies": {
+    "forkdb": "^3.1.0",
+    "bytewise": "~0.7.1",
+    "defined": "~0.0.0",
+    "level-party": "^1.0.1",
+    "inherits": "~2.0.1",
+    "minimist": "~1.1.0",
+    "mkdirp": "~0.5.0",
+    "split": "~0.3.0",
+    "stream-combiner2": "~1.0.2",
+    "through2": "~1.1.1"
+  },
+  "devDependencies": {
+    "tape": "^3.0.0"
+  },
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/substack/wikidb.git"
+  },
+  "homepage": "https://github.com/substack/wikidb",
+  "keywords": [
+    "wiki",
+    "level",
+    "database",
+    "multi-master",
+    "replication",
+    "forkdb"
+  ],
+  "author": {
+    "name": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net"
+  },
+  "license": "MIT"
+}
