@@ -1,7 +1,6 @@
 var ForkDB = require('forkdb');
 var inherits = require('inherits');
 var through = require('through2');
-var inherits = require('inherits');
 var defined = require('defined');
 var combine = require('stream-combiner2');
 var split = require('split');
