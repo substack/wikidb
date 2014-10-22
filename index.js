@@ -110,7 +110,7 @@ WikiDB.prototype.search = function (terms, opts) {
         var pending = 2;
         row.key.split(/[^\w~-]/).forEach(ifmatch);
         
-        self.getMeta(row.hash, function (err, meta) {
+        self.get(row.hash, function (err, meta) {
             if (meta && meta.tags) {
                 meta.tags.forEach(ifmatch);
             }
@@ -120,7 +120,7 @@ WikiDB.prototype.search = function (terms, opts) {
             ifmatch(buf.toString('utf8'));
             if (matches.length) next();
         }, end);
-        self.get(row.hash).pipe(split(/[^\w~-]/)).pipe(words);
+        self.createReadStream(row.hash).pipe(split(/[^\w~-]/)).pipe(words);
         
         function ifmatch (word) {
             var ix = matches.indexOf(word);
@@ -155,7 +155,7 @@ WikiDB.prototype.recent = function (opts) {
     }
     var s = self.db.createReadStream(sopts);
     var tr = through.obj(function (row, enc, next) {
-        self.getMeta(row.value, function (err, meta) {
+        self.get(row.value, function (err, meta) {
             tr.push({ hash: row.value, meta: meta });
             next();
         });

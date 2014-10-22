@@ -7,7 +7,7 @@
     "wikidb": "bin/cmd.js"
   },
   "dependencies": {
-    "forkdb": "^3.1.0",
+    "forkdb": "^6.0.0",
     "bytewise": "~0.7.1",
     "defined": "~0.0.0",
     "level-party": "^1.0.1",
