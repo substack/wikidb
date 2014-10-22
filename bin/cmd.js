@@ -19,48 +19,49 @@ mkdirp.sync(blobdir);
 
 var db = level(dbdir);
 var wdb = wikidb(db, { dir: blobdir });
+var cmd = argv._[0];
 
-if (argv._[0] === 'keys') {
+if (cmd === 'keys') {
     var r = wdb.keys();
     r.on('data', console.log);
     r.on('end', function () { db.close() });
 }
-else if (argv._[0] === 'list') {
+else if (cmd === 'list') {
     var r = wdb.list();
     r.on('data', console.log);
     r.on('end', function () { db.close() });
 }
-else if (argv._[0] === 'heads') {
+else if (cmd === 'heads') {
     var r = wdb.heads(argv._[1]);
     r.on('data', console.log);
     r.on('end', function () { db.close() });
 }
-else if (argv._[0] === 'recent') {
+else if (cmd === 'recent') {
     var r = wdb.recent({ key: argv._[1] })
     r.on('data', console.log);
     r.on('end', function () { db.close() });
 }
-else if (argv._[0] === 'by-tag') {
+else if (cmd === 'by-tag') {
     var r = wdb.byTag(argv._[1]);
     r.on('data', console.log);
     r.on('end', function () { db.close() });
 }
-else if (argv._[0] === 'search') {
+else if (cmd === 'search') {
     var r = wdb.search(argv._.slice(1));
     r.on('data', console.log);
     r.on('end', function () { db.close() });
 }
-else if (argv._[0] === 'get') {
+else if (cmd === 'get') {
     var r = wdb.get(argv._[1]);
     r.pipe(process.stdout);
     r.on('end', function () { db.close() });
 }
-else if (argv._[0] === 'sync') {
-    var r = wdb.replicate({ mode: argv.mode });
+else if (cmd === 'sync' || cmd === 'pull' || cmd === 'push') {
+    var r = wdb.replicate({ mode: cmd });
     r.pipe(process.stdout);
     r.on('end', function () { db.close() });
 }
-else if (argv._[0] === 'create') {
+else if (cmd === 'create') {
     var meta = { key: argv._[1] };
     if (argv.prev) meta.prev = [].concat(argv.prev);
     if (argv.tag || argv.tags) {
