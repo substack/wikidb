@@ -2,7 +2,7 @@ var ForkDB = require('forkdb');
 var inherits = require('inherits');
 var through = require('through2');
 var defined = require('defined');
-var combine = require('stream-combiner2');
+var readonly = require('read-only-stream');
 var split = require('split');
 
 module.exports = WikiDB;
@@ -80,7 +80,7 @@ WikiDB.prototype.createWriteStream = function (meta, cb) {
     }
 };
 
-WikiDB.prototype.byTag = function (opts) {
+WikiDB.prototype.byTag = function (opts, cb) {
     if (!opts) opts = {};
     if (typeof opts === 'string') opts = { tag: opts };
     var r = this.db.createReadStream({
@@ -88,13 +88,16 @@ WikiDB.prototype.byTag = function (opts) {
         lt: [ 'wiki-tag', opts.tag, defined(opts.lt, undefined) ],
         limit: opts.limit
     });
-    return combine([ r, through.obj(write) ]);
+    var output = readonly(r.pipe(through.obj(write)));
+    r.on('error', function (err) { output.emit('error', err) });
+    if (cb) {
+        output.pipe(collect(cb));
+        output.on('error', cb);
+    }
+    return output;
     
     function write (row, enc, next) {
-        this.push({
-            key: row.key[2],
-            hash: row.key[3]
-        });
+        this.push({ key: row.key[2], hash: row.key[3] });
         next();
     }
 };
@@ -153,6 +156,8 @@ WikiDB.prototype.recent = function (opts) {
             lt: [ 'wiki', opts.lt ]
         };
     }
+    if (opts.limit !== undefined) sopts.limit = opts.limit;
+    
     var s = self.db.createReadStream(sopts);
     var tr = through.obj(function (row, enc, next) {
         self.get(row.value, function (err, meta) {
@@ -163,3 +168,10 @@ WikiDB.prototype.recent = function (opts) {
     s.on('error', function (err) { tr.emit('error', err) });
     return s.pipe(tr);
 };
+
+function collect (cb) {
+    var rows = [];
+    return through.obj(write, end);
+    function write (row, enc, next) { rows.push(row); next() }
+    function end () { cb(null, rows) }
+}
