@@ -41,6 +41,7 @@ test('recent', function (t) {
         var r = wdb.createReadStream(row.hash);
         r.pipe(concat(function (body) {
             t.equal(body.toString('utf8'), 'beep boop');
+            next();
         }));
     }));
 });

@@ -106,46 +106,36 @@ WikiDB.prototype.search = function (terms, opts) {
     var self = this;
     if (!opts) opts = {};
     if (typeof terms === 'string') terms = terms.split(/\s+/);
+    return readonly(this.keys().pipe(through.obj(kwrite, kend)));
     
-    return readonly(this.keys().pipe(kwrite));
-    
-    function kwrite (krow, enc, next) {
-        self.heads(krow.key).pipe(through.obj(function (row, enc, next) {
-            next();
-        }));
+    function kwrite (krow, enc, knext) {
+        var kstream = this;
+        var h = self.heads(krow.key);
+        var hstream = h.pipe(through.obj(hwrite, function () { knext() }));
+        h.on('error', function (err) { hstream.emit('error', err) });
+        
+        function hwrite (hrow, enc, hnext) {
+            var pending = terms.slice();
+            
+            var r = self.createReadStream(hrow.hash);
+            r.on('error', function (err) { hstream.emit('error', err) });
+            r.pipe(split()).pipe(through(function (line, enc, next) {
+                for (var i = 0; i < pending.length; i++) {
+                    var t = pending[i];
+                    if (line.toString('utf8').indexOf(t) >= 0) {
+                        pending.splice(i, 1);
+                        i--;
+                    }
+                }
+                if (pending.length === 0) {
+                    kstream.push({ hash: hrow.hash, key: krow.key });
+                    hnext();
+                }
+                else next();
+            }, function () { hnext() }));
+        }
     }
-    
-    return this.heads().pipe(through.obj(function (row, enc, next) {
-        var output = this;
-        var matches = terms.slice();
-        var pending = 2;
-        row.key.split(/[^\w~-]/).forEach(ifmatch);
-        
-        self.get(row.hash, function (err, meta) {
-            if (meta && meta.tags) {
-                meta.tags.forEach(ifmatch);
-            }
-            end();
-        });
-        var words = through(function (buf, enc, next) {
-            ifmatch(buf.toString('utf8'));
-            if (matches.length) next();
-        }, end);
-        self.createReadStream(row.hash).pipe(split(/[^\w~-]/)).pipe(words);
-        
-        function ifmatch (word) {
-            var ix = matches.indexOf(word);
-            if (ix < 0) return;
-            matches.splice(ix, 1);
-            if (matches.length === 0) {
-                output.push(row);
-                next();
-            }
-        }
-        function end () {
-            if (matches.length !== 0 && -- pending === 0) next();
-        }
-    }));
+    function kend () { this.push(null) }
 };
 
 WikiDB.prototype.recent = function (opts, cb) {
