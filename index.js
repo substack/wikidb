@@ -107,6 +107,14 @@ WikiDB.prototype.search = function (terms, opts) {
     if (!opts) opts = {};
     if (typeof terms === 'string') terms = terms.split(/\s+/);
     
+    return readonly(this.keys().pipe(kwrite));
+    
+    function kwrite (krow, enc, next) {
+        self.heads(krow.key).pipe(through.obj(function (row, enc, next) {
+            next();
+        }));
+    }
+    
     return this.heads().pipe(through.obj(function (row, enc, next) {
         var output = this;
         var matches = terms.slice();
@@ -140,7 +148,7 @@ WikiDB.prototype.search = function (terms, opts) {
     }));
 };
 
-WikiDB.prototype.recent = function (opts) {
+WikiDB.prototype.recent = function (opts, cb) {
     if (!opts) opts = {};
     var self = this;
     var sopts;
@@ -166,6 +174,10 @@ WikiDB.prototype.recent = function (opts) {
         });
     });
     s.on('error', function (err) { tr.emit('error', err) });
+    if (cb) {
+        tr.on('error', cb);
+        tr.pipe(collect(cb));
+    }
     return s.pipe(tr);
 };
 
