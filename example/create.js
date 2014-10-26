@@ -9,7 +9,7 @@ var wdb = wikidb(db, { dir: '/tmp/wiki.blob' });
 var opts = {
     key: argv._[0],
     prev: argv.prev,
-    tag: argv.tag
+    tags: argv.tag
 };
 var w = wdb.createWriteStream(opts, function (err, key) {
     console.log(key);
