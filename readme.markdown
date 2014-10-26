@@ -8,7 +8,7 @@ database for offline-first distributed wikis
 
 First, we'll have a script to create documents:
 
-```
+``` js
 var wikidb = require('wikidb');
 var db = require('level')('/tmp/wiki.db');
 var minimist = require('minimist');
