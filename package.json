@@ -1,13 +1,12 @@
 {
   "name": "wikidb",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "database for offline wikis with multi-master replication",
   "main": "index.js",
   "bin": {
     "wikidb": "bin/cmd.js"
   },
   "dependencies": {
-    "bytewise": "~0.7.1",
     "defined": "~0.0.0",
     "forkdb": "^6.0.0",
     "inherits": "~2.0.1",
