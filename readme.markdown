@@ -2,6 +2,8 @@
 
 database for offline-first distributed wikis
 
+[![build status](https://secure.travis-ci.org/substack/wikidb.png)](http://travis-ci.org/substack/wikidb)
+
 # example
 
 ## create
