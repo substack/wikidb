@@ -14,13 +14,19 @@ function WikiDB (db, opts) {
     ForkDB.call(this, db, opts);
 }
 
-WikiDB.prototype.createWriteStream = function (meta, cb) {
+WikiDB.prototype.createWriteStream = function (meta, opts, cb) {
     var self = this;
     if (!meta) meta = {};
     if (!meta.time) meta.time = Date.now();
+    if (typeof opts === 'function') {
+        cb = opts;
+        opts = {};
+    }
+    if (!opts) opts = {};
+    var pre = opts.prebatch;
+    opts.prebatch = prebatch;
     
     var tags = [].concat(meta.tags).filter(Boolean);
-    var opts = { prebatch: prebatch };
     return ForkDB.prototype.createWriteStream.call(this, meta, opts, cb);
     
     function prebatch (rows, wkey, cb_) {
@@ -73,10 +79,14 @@ WikiDB.prototype.createWriteStream = function (meta, cb) {
                         key: [ 'wiki-tag', p ].concat(prevHead)
                     });
                 });
-                cb_(null, rows);
+                if (pre) pre(rows, wkey, cb_)
+                else cb_(null, rows);
             });
         }
-        else cb_(null, rows)
+        else {
+            if (pre) pre(rows, wkey, cb_)
+            else cb_(null, rows)
+        }
     }
 };
 
