@@ -109,7 +109,7 @@ Optionally provide an `opts.prebatch(rows, key, fn)` function that will be
 called before `rows` are inserted with `db.batch()`. `fn(err, rows)` should
 provide the new rows to insert.
 
-Optionally tag a document by setting `opts.tags` to an array of string tags.
+Optionally tag a document by setting `meta.tags` to an array of string tags.
 
 `cb(err, hash)` fires with an error or the hash of the content written into `w`.
 
