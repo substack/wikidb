@@ -1,6 +1,6 @@
 {
   "name": "wikidb",
-  "version": "1.1.2",
+  "version": "2.0.0",
   "description": "database for offline wikis with multi-master replication",
   "main": "index.js",
   "bin": {
@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "defined": "~0.0.0",
-    "forkdb": "^8.0.0",
+    "forkdb": "^8.1.0",
     "inherits": "~2.0.1",
     "level-party": "^1.0.1",
     "minimist": "~1.1.0",
