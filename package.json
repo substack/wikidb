@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "defined": "~0.0.0",
-    "forkdb": "^6.0.0",
+    "forkdb": "^8.0.0",
     "inherits": "~2.0.1",
     "level-party": "^1.0.1",
     "minimist": "~1.1.0",
