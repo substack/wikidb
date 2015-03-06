@@ -155,13 +155,17 @@ WikiDB.prototype.recent = function (opts, cb) {
     if (opts.key) {
         sopts = {
             gt: [ 'wiki-key', opts.key, defined(opts.gt, null) ],
-            lt: [ 'wiki-key', opts.key, opts.lt ]
+            lt: [ 'wiki-key', opts.key, opts.lt ],
+            limit: opts.limit,
+            reverse: !opts.reverse
         };
     }
     else {
         sopts = {
             gt: [ 'wiki', defined(opts.gt, null) ],
-            lt: [ 'wiki', opts.lt ]
+            lt: [ 'wiki', opts.lt ],
+            limit: opts.limit,
+            reverse: !opts.reverse
         };
     }
     if (opts.limit !== undefined) sopts.limit = opts.limit;

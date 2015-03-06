@@ -73,16 +73,16 @@ Running the script shows the recent changes:
 ```
 $ node recent.js 
 key:  welcome page
-hash: 2e0c45ea142f59b52d616bcf17837ff4aa07d985ec2b55d13b42c4104a67f0a2
-date: Fri Oct 24 2014 10:04:07 GMT+0100 (BST)
------------------------------
-hello there
-
-key:  welcome page
 hash: e208b25dde1e33f70ab0cb047ed5ce2e87fca1e782c5598bc2ebc7465ce478d2
 date: Fri Oct 24 2014 10:04:19 GMT+0100 (BST)
 -----------------------------
 greetings, stranger!
+
+key:  welcome page
+hash: 2e0c45ea142f59b52d616bcf17837ff4aa07d985ec2b55d13b42c4104a67f0a2
+date: Fri Oct 24 2014 10:04:07 GMT+0100 (BST)
+-----------------------------
+hello there
 
 ```
 
@@ -135,6 +135,11 @@ properties on each object.
 
 List documents with a readable object stream `r` ordered by date, most recent to
 least recent. Each object output by `r` has a `hash` and `key` property.
+
+You can pass through `opts.reverse` and `opts.limit` to the underlying database
+query.
+
+The default ordering is most recent to least recent.
 
 # forkdb methods
 
