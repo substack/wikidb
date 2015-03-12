@@ -1,6 +1,6 @@
 {
   "name": "wikidb",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "database for offline wikis with multi-master replication",
   "main": "index.js",
   "bin": {
