@@ -90,6 +90,31 @@ WikiDB.prototype.createWriteStream = function (meta, opts, cb) {
     }
 };
 
+WikiDB.prototype.tags = function (opts, cb) {
+    if (!opts) opts = {};
+    if (typeof opts === 'function') {
+        cb = opts;
+        opts = {};
+    }
+    var r = this.db.createReadStream({
+        gt: [ 'wiki-tag', defined(opts.gt, null) ],
+        lt: [ 'wiki-tag', defined(opts.lt, undefined) ],
+        limit: opts.limit
+    });
+    var output = readonly(r.pipe(through.obj(write)));
+    r.on('error', function (err) { output.emit('error', err) });
+    if (cb) {
+        output.pipe(collect(cb));
+        output.on('error', cb);
+    }
+    return output;
+    
+    function write (row, enc, next) {
+        this.push({ tag: row.key[1] });
+        next();
+    }
+};
+
 WikiDB.prototype.byTag = function (opts, cb) {
     if (!opts) opts = {};
     if (typeof opts === 'string') opts = { tag: opts };
