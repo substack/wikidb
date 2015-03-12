@@ -123,6 +123,15 @@ If `opts` is a string, `opts` will be used as the `opts.tag`.
 If provided, `cb(err, results)` fires with an error or the array of `results`
 objects.
 
+## var r = wdb.tags(opts, cb)
+
+Return a readable object stream `r` that produces all tags.
+
+Use `opts` to bound the query (`opts.lt`, `opts.gt`, and `opts.limit`)
+and `cb(err, tags)` to collect results into an array `tags`.
+
+Each object in `r` has a single `tag` property with a string value.
+
 ## var r = wdb.search(terms, opts={})
 
 Search for `terms`, an array of strings which must all be present in a full text
