@@ -58,7 +58,7 @@ else if (cmd === 'get') {
 }
 else if (cmd === 'sync' || cmd === 'pull' || cmd === 'push') {
     var r = wdb.replicate({ mode: cmd });
-    r.pipe(process.stdout);
+    process.stdin.pipe(r).pipe(process.stdout);
     r.on('end', function () { db.close() });
 }
 else if (cmd === 'create') {
