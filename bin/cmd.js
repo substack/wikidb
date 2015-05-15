@@ -81,13 +81,11 @@ else if (cmd === 'read') {
     var r = wdb.createReadStream(argv._[1]);
     r.pipe(process.stdout);
     r.on('error', error);
-    r.on('end', function () { db.close() });
 }
 else if (cmd === 'get') {
     wdb.get(argv._[1], function (err, meta) {
         if (err) error(err)
         else console.log(meta)
-        db.close();
     });
 }
 else if (cmd === 'sync' || cmd === 'pull' || cmd === 'push') {
