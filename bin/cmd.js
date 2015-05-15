@@ -1,19 +1,28 @@
 #!/usr/bin/env node
 
-var level = require('level');
-var minimist = require('minimist');
-var wikidb = require('../');
+var fs = require('fs');
 var path = require('path');
 var defined = require('defined');
+
+var minimist = require('minimist');
+var argv = minimist(process.argv.slice(2), {
+    alias: { d: 'datadir', h: 'help' },
+    default: { datadir: defined(process.env.WIKIDB_DIR, './wiki') }
+});
+if (argv._[0] === 'help' || argv.help) {
+    return fs.createReadStream(path.join(__dirname, 'usage.txt'))
+        .pipe(process.stdout)
+    ;
+}
+
+var level = require('level');
+var wikidb = require('../');
 var mkdirp = require('mkdirp');
+var strftime = require('strftime');
 
 var showHistory = require('forkdb/bin/lib/show_history.js');
 var showFuture = require('forkdb/bin/lib/show_future.js');
 
-var argv = minimist(process.argv.slice(2), {
-    alias: { d: 'datadir' },
-    default: { datadir: defined(process.env.WIKIDB_DIR, './wiki') }
-});
 var dbdir = path.join(argv.datadir, 'db');
 var blobdir = path.join(argv.datadir, 'blob');
 
@@ -26,7 +35,7 @@ var cmd = argv._[0];
 
 if (cmd === 'keys') {
     var r = wdb.keys();
-    r.on('data', console.log);
+    r.on('data', function (doc) { console.log(doc.key) });
     r.on('end', function () { db.close() });
 }
 else if (cmd === 'list') {
@@ -36,12 +45,17 @@ else if (cmd === 'list') {
 }
 else if (cmd === 'heads') {
     var r = wdb.heads(argv._[1]);
-    r.on('data', console.log);
+    r.on('data', function (doc) { console.log(doc.hash) });
     r.on('end', function () { db.close() });
 }
 else if (cmd === 'recent') {
     var r = wdb.recent({ key: argv._[1] })
-    r.on('data', console.log);
+    r.on('data', function (doc) {
+        console.log('hash: ' + doc.hash);
+        console.log('key: ' + doc.meta.key);
+        console.log('date: ' + new Date(doc.meta.time).toISOString());
+        console.log();
+    });
     r.on('end', function () { db.close() });
 }
 else if (cmd === 'history') {
@@ -57,7 +71,11 @@ else if (cmd === 'by-tag') {
 }
 else if (cmd === 'search') {
     var r = wdb.search(argv._.slice(1));
-    r.on('data', console.log);
+    r.on('data', function (doc) {
+        console.log('key:' + doc.key);
+        console.log('hash: ' + doc.hash);
+        console.log();
+    });
     r.on('end', function () { db.close() });
 }
 else if (cmd === 'get') {
