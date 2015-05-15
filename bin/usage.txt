@@ -7,9 +7,13 @@ wikidb create KEY {OPTIONS}
   --tag=TAG    Add a tag. You can have multiple tags with more than one
                `--tag`.
 
-wikidb get HASH
+wikidb read HASH
 
   Print the document contents for HASH.
+  
+wikidb get HASH
+
+  Print the metadata for HASH.
 
 wikidb keys
 

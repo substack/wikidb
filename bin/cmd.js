@@ -18,7 +18,6 @@ if (argv._[0] === 'help' || argv.help) {
 var level = require('level');
 var wikidb = require('../');
 var mkdirp = require('mkdirp');
-var strftime = require('strftime');
 
 var showHistory = require('forkdb/bin/lib/show_history.js');
 var showFuture = require('forkdb/bin/lib/show_future.js');
@@ -76,6 +75,12 @@ else if (cmd === 'search') {
         console.log('hash: ' + doc.hash);
         console.log();
     });
+    r.on('end', function () { db.close() });
+}
+else if (cmd === 'read') {
+    var r = wdb.createReadStream(argv._[1]);
+    r.pipe(process.stdout);
+    r.on('error', error);
     r.on('end', function () { db.close() });
 }
 else if (cmd === 'get') {
