@@ -86,6 +86,77 @@ hello there
 
 ```
 
+# usage
+
+This package ships with a `wikidb` command:
+
+```
+wikidb create KEY {OPTIONS}
+
+  Add a new document at KEY with the content from stdin.
+
+  --prev=PREV  Point at a previous hash. You can point back at multiple
+               hashes with more than one `--prev`..
+  --tag=TAG    Add a tag. You can have multiple tags with more than one
+               `--tag`.
+
+wikidb read HASH
+
+  Print the document contents for HASH.
+  
+wikidb get HASH
+
+  Print the metadata for HASH.
+
+wikidb keys
+
+  List all keys.
+
+wikidb list
+
+  List all documents.
+
+wikidb heads KEY
+
+  Print all the heads for KEY.
+
+wikidb recent KEY
+
+  Print all updates to KEY, most recent updates first.
+
+wikidb history HASH
+
+  Print the entire history starting at HASH.
+
+wikidb future HASH
+
+  Print every hash that descends from HASH.
+
+wikidb search TERMS...
+
+  Search for documents that include TERMS.
+
+wikidb by-tag
+
+  Search for documents by tag name.
+
+wikidb sync
+
+  Bidirectional (push and pull) replication strategy.
+  stdin and stdout are used to wire up the replication protocol.
+
+wikidb pull
+
+  Get documents from an endpoint.
+  stdin and stdout are used to wire up the replication protocol.
+
+wikidb push
+
+  Push documents to an endpoint.
+  stdin and stdout are used to wire up the replication protocol.
+
+```
+
 # methods
 
 ``` js
@@ -211,6 +282,12 @@ With [npm](https://npmjs.org), do:
 
 ```
 npm install wikidb
+```
+
+or to get the `wikidb` command, do:
+
+```
+npm install -g wikidb
 ```
 
 # license
