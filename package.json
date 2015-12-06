@@ -19,8 +19,6 @@
   },
   "devDependencies": {
     "concat-stream": "^1.4.6",
-    "level": "~0.18.0",
-    "mkdirp": "^0.5.0",
     "osenv": "^0.1.0",
     "tape": "^3.0.0"
   },
